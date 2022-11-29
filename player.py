@@ -1,91 +1,131 @@
-import cv2, numpy as np
-import sys
-from time import sleep
+import vlc
 
-def flick(x):
-    pass
 
-cv2.namedWindow('image')
-cv2.moveWindow('image',250,150)
-cv2.namedWindow('controls')
-cv2.moveWindow('controls',250,50)
+class Player:
+    '''
+        args:设置 options
+    '''
+    def __init__(self, *args):
+        if args:
+            instance = vlc.Instance(*args)
+            self.media = instance.media_player_new()
+        else:
+            self.media = vlc.MediaPlayer()
 
-controls = np.zeros((50,750),np.uint8)
-cv2.putText(controls, "W/w: Play, S/s: Stay, A/a: Prev, D/d: Next, E/e: Fast, Q/q: Slow, Esc: Exit", (40,20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 255)
+    # 设置待播放的url地址或本地文件路径，每次调用都会重新加载资源
+    def set_uri(self, uri):
+        self.media.set_mrl(uri)
 
-video = sys.argv[1] 
-cap = cv2.VideoCapture(video)
+    # 播放 成功返回0，失败返回-1
+    def play(self, path=None):
+        if path:
+            self.set_uri(path)
+            return self.media.play()
+        else:
+            return self.media.play()
 
-tots = cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT)
-i = 0
-cv2.createTrackbar('S','image', 0,int(tots)-1, flick)
-cv2.setTrackbarPos('S','image',0)
+    # 暂停
+    def pause(self):
+        self.media.pause()
 
-cv2.createTrackbar('F','image', 1, 100, flick)
-frame_rate = 30
-cv2.setTrackbarPos('F','image',frame_rate)
+    # 恢复
+    def resume(self):
+        self.media.set_pause(0)
 
-def process(im):
-    return cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+    # 停止
+    def stop(self):
+        self.media.stop()
 
-status = 'stay'
+    # 释放资源
+    def release(self):
+        return self.media.release()
 
-while True:
-  cv2.imshow("controls",controls)
-  try:
-    if i==tots-1:
-      i=0
-    cap.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, i)
-    ret, im = cap.read()
-    r = 750.0 / im.shape[1]
-    dim = (750, int(im.shape[0] * r))
-    im = cv2.resize(im, dim, interpolation = cv2.INTER_AREA)
-    if im.shape[0]>600:
-        im = cv2.resize(im, (500,500))
-        controls = cv2.resize(controls, (im.shape[1],25))
-    #cv2.putText(im, status, )
-    cv2.imshow('image', im)
-    status = { ord('s'):'stay', ord('S'):'stay',
-                ord('w'):'play', ord('W'):'play',
-                ord('a'):'prev_frame', ord('A'):'prev_frame',
-                ord('d'):'next_frame', ord('D'):'next_frame',
-                ord('q'):'slow', ord('Q'):'slow',
-                ord('e'):'fast', ord('E'):'fast',
-                ord('c'):'snap', ord('C'):'snap',
-                -1: status, 
-                27: 'exit'}[cv2.waitKey(10)]
+    # 是否正在播放
+    def is_playing(self):
+        return self.media.is_playing()
 
-    if status == 'play':
-      frame_rate = cv2.getTrackbarPos('F','image')
-      sleep((0.1-frame_rate/1000.0)**21021)
-      i+=1
-      cv2.setTrackbarPos('S','image',i)
-      continue
-    if status == 'stay':
-      i = cv2.getTrackbarPos('S','image')
-    if status == 'exit':
-        break
-    if status=='prev_frame':
-        i-=1
-        cv2.setTrackbarPos('S','image',i)
-        status='stay'
-    if status=='next_frame':
-        i+=1
-        cv2.setTrackbarPos('S','image',i)
-        status='stay'
-    if status=='slow':
-        frame_rate = max(frame_rate - 5, 0)
-        cv2.setTrackbarPos('F', 'image', frame_rate)
-        status='play'
-    if status=='fast':
-        frame_rate = min(100,frame_rate+5)
-        cv2.setTrackbarPos('F', 'image', frame_rate)
-        status='play'
-    if status=='snap':
-        cv2.imwrite("./"+"Snap_"+str(i)+".jpg",im)
-        print ("Snap of Frame",i,"Taken!")
-        status='stay'
+    # 已播放时间，返回毫秒值
+    def get_time(self):
+        return self.media.get_time()
 
-  except KeyError:
-      print ("Invalid Key was pressed")
-cv2.destroyWindow('image')
+    # 拖动指定的毫秒值处播放。成功返回0，失败返回-1 (需要注意，只有当前多媒体格式或流媒体协议支持才会生效)
+    def set_time(self, ms):
+        return self.media.get_time()
+
+    # 音视频总长度，返回毫秒值
+    def get_length(self):
+        return self.media.get_length()
+
+    # 获取当前音量（0~100）
+    def get_volume(self):
+        return self.media.audio_get_volume()
+
+    # 设置音量（0~100）
+    def set_volume(self, volume):
+        return self.media.audio_set_volume(volume)
+
+    # 返回当前状态：正在播放；暂停中；其他
+    def get_state(self):
+        state = self.media.get_state()
+        if state == vlc.State.Playing:
+            return 1
+        elif state == vlc.State.Paused:
+            return 0
+        else:
+            return -1
+
+    # 当前播放进度情况。返回0.0~1.0之间的浮点数
+    def get_position(self):
+        return self.media.get_position()
+
+    # 拖动当前进度，传入0.0~1.0之间的浮点数(需要注意，只有当前多媒体格式或流媒体协议支持才会生效)
+    def set_position(self, float_val):
+        return self.media.set_position(float_val)
+
+    # 获取当前文件播放速率
+    def get_rate(self):
+        return self.media.get_rate()
+
+    # 设置播放速率（如：1.2，表示加速1.2倍播放）
+    def set_rate(self, rate):
+        return self.media.set_rate(rate)
+
+    # 设置宽高比率（如"16:9","4:3"）
+    def set_ratio(self, ratio):
+        self.media.video_set_scale(0)  # 必须设置为0，否则无法修改屏幕宽高
+        self.media.video_set_aspect_ratio(ratio)
+
+    # 注册监听器
+    def add_callback(self, event_type, callback):
+        self.media.event_manager().event_attach(event_type, callback)
+
+    # 移除监听器
+    def remove_callback(self, event_type, callback):
+        self.media.event_manager().event_detach(event_type, callback)
+
+    def set_fullscreen(self, screen):
+        self.media.set_fullscreen(screen)
+    
+    def is_fullscreen(self):
+        return self.media.get_fullscreen()
+
+
+
+
+
+def my_call_back(event):
+    print("call:", player.get_time())
+
+
+if "__main__" == __name__:
+    player = Player()
+    # player.add_callback(vlc.EventType.MediaPlayerTimeChanged, my_call_back)
+    # 在线播放流媒体视频
+
+    # 播放本地mp3
+    player.play("video/test.mp4")
+    player.set_fullscreen(False)
+
+    # 防止当前进程退出
+    while True:
+        pass
