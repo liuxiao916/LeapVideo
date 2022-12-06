@@ -17,7 +17,8 @@ class State():
         self.hand_distance = []
         self.start_distance = None
         
-    def detect_onehand(self,position,hand_available):
+    def detect_onehand(self,position,direction,hand_available):
+        
         if hand_available:
             if len(self.hand_position) > 15:
                 self.hand_position.append(position)
@@ -39,7 +40,21 @@ class State():
                     self.hand_position.clear()
                     self.action_begin_position = self.start_position[0]
                     print('3')
+                
+                # up 
+                elif (position[2] - self.start_position[2] < -80) and abs(direction[2])>0.5:
+                    # print(self.hand_position)
+                    self.state = 8
+                    self.hand_position.clear()
+                    print('8')
 
+                # down
+                elif position[2] - self.start_position[2] > 80 and abs(direction[2])>0.5:
+                    # print(self.hand_position)
+                    self.state = 9
+                    self.hand_position.clear()
+                    print('9')
+                
                 # forward
                 elif position[1] - self.start_position[1] < -80:
                     self.state = 1
@@ -122,7 +137,7 @@ class SampleListener(Leap.Listener):
             right_hand = frame.hands.rightmost
             state.detect_twohand(left_hand.palm_position, right_hand.palm_position)
         else:
-            state.detect_onehand(hand.palm_position,hand.is_valid)
+            state.detect_onehand(hand.palm_position,hand.palm_normal,hand.is_valid)
             
         if not hand.is_valid:
             if not state.state == 2 and not state.state == 3:
