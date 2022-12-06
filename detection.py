@@ -255,10 +255,11 @@ class State():
         self.distance_action5 = self.calculate_distance(right_position,left_position)
         if self.distance_action5 < self.prev_distance_action5:
             if self.move_time_action5 == 0:
-                # print('begin Two')
+                print('begin action5')
                 self.action5_begin_distance = self.prev_distance_action5
             self.move_time_action5 = self.move_time_action5 +1
-            if self.move_time_action5 > 10 and (self.distance_action5-self.action5_begin_distance)<60:
+            print(self.distance_action5)
+            if self.move_time_action5 > 10 and (self.distance_action5-self.action5_begin_distance)<150:
                 self.move_time_action5 = -1
                 print("detect action5")
                 print(self.distance_action5-self.action5_begin_distance)

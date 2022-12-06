@@ -60,7 +60,7 @@ def main():
     controller.add_listener(listener)
 
     videoplayer = player.Player()
-    videoplayer.play("video/test.mp4")
+    videoplayer.play("video/test1.mp4")
     
     # videoplayer.play("https://www.youtube.com/watch?v=0Hm13NaMKvo")
     # Keep this process running until Enter is pressed
@@ -80,13 +80,20 @@ def main():
                 time.sleep(2)
         
         if state.s == 4 :
+            #print("action 4")
             if not videoplayer.is_fullscreen():
                 print("Try fullscreen")
                 videoplayer.set_fullscreen(True)
                 state.clear_state()
                 time.sleep(2)
+            else:
+                print("close fullscreen")
+                videoplayer.set_fullscreen(False)
+                state.clear_state()
+                time.sleep(2)       
         
         # if state.s == 7:
+        #     print("action 7 here")
         #     if videoplayer.is_fullscreen():
         #         print("Close fullscreen")
         #         videoplayer.set_fullscreen(False)
@@ -105,6 +112,9 @@ def main():
             
 
         if state.s == 2:
+            video_length = videoplayer.get_length()     #  总时间
+            time_current = videoplayer.get_time() # 当前时间
+            set_time  = int((state.length/500)*(video_length-time_current)) + time_current
             videoplayer.set_position(set_time/video_length)
             print("完成快进")
             videoplayer.resume()
@@ -124,6 +134,9 @@ def main():
             
 
         if state.s == 3:
+            video_length = videoplayer.get_length()     #  总时间
+            time_current = videoplayer.get_time() # 当前时间
+            set_time  = int((state.length/500)*(video_length-time_current)) + time_current
             videoplayer.set_position(set_time/video_length)
             print("完成退")
             videoplayer.resume()
