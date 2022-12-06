@@ -8,279 +8,96 @@ threadLock = threading.Lock()
 
 class State():
     def __init__(self):
-        self.s = 0
-        # self.time = 0 
-        self.length = 0
-        # param for detect action1
-        # self.hands_prev_direction = np.array([0,0,-1])
-        # self.hands_begin_direction = None  #开始向下运动的角度
-        # self.rotate_time = -1          #往下运动的帧数
-        self.action1_prev_position = np.array([0,0,0])
-        self.action1_begin_position = None
-        self.action1_time = -1
+        self.state = 0
+        self.hand_position = []
+        self.start_position = None   # 记录十五帧前的手位置
+        self.action_begin_position = None #记录动作2(快进)和3（倒退）的起始位置
+        self.action_length = 0 #记录动作2和3的长度
 
-        # param for detect action2
-        self.hands_prev_position_right = np.array([0,0,0])
-        self.hands_begin_position_right = None
-        self.move_right_time = -1
-
-        # param for detect action3
-        self.hands_prev_position_left = np.array([0,0,0])
-        self.hands_begin_position_left = None
-        self.move_left_time = -1
-
-        # param for detect action4
-        self.move_time = -1
-        self.prev_distance = 0
-        self.distance = 0
-        self.action4_begin_distance = 0
-
-
-        # param for detect action5
-        self.move_time_action5 = -1
-        self.prev_distance_action5 = 0
-        self.distance_action5 = 0
-        self.action5_begin_distance = 0
-
-    # def detect_action1(self,direction):
-    #     if self.rotate_time == -1:
-    #         self.rotate_time = self.rotate_time+1
-    #         self.hands_prev_direction = direction
-    #         return False
-
-    #     # 判断是否往下运动
-    #     #print(direction)
-    #     if (direction[2]-self.hands_prev_direction[2]) > 0:
-    #         if self.rotate_time == 0:
-    #             print('begin')
-    #             self.rotate_begin_direction = self.hands_prev_direction
-    #         self.rotate_time = self.rotate_time + 1
-    #         if self.rotate_time > 5 and (direction[2] - self.rotate_begin_direction[2])> 0.4:
-    #             self.rotate_time = -1
-    #             print("detect action1")
-
-    #     if (direction[2]-self.hands_prev_direction[2]) < 0:
-    #         self.rotate_time =-1
-
-    #     self.hands_prev_direction = direction
-
-    def detect_action1(self,position):
-        if self.action1_time == -1:
-            self.action1_time = self.action1_time+1
-            self.action1_prev_position = position
-            return False
-
-        # 判断是否往下运动
-        #print(direction)
-        if (position[1]-self.action1_prev_position[1]) < 0:
-            if self.action1_time == 0:
-                # print('begin')
-                self.action1_begin_position = self.action1_prev_position
-            self.action1_time = self.action1_time + 1
-            if self.action1_time > 10 and (position[1] - self.action1_begin_position[1]) < -60:
-                self.action1_time = -1
-                print("detect action1")
-                self.s = 1
-                # self.time = 100
-
-        if (position[1]-self.action1_prev_position[1]) > 0:
-            self.action1_time =-1
-
-        self.action1_prev_position = position
+        self.hand_distance = []
+        self.start_distance = None
         
-    # 检测往右运动
-    # def detect_action2(self,position):
-    #     if self.move_right_time == -1:
-    #         self.move_right_time = self.move_right_time+1
-    #         self.hands_prev_position_right = position
-    #         return False
-            
-    #     # 判断是否往右边运动
-    #     if (position[0]-self.hands_prev_position_right[0]) > 0.01:
-    #         if self.move_right_time == 0:
-    #             # print('begin')
-    #             self.hands_begin_position_right = self.hands_prev_position_right
-    #         self.move_right_time = self.move_right_time + 1
-            
-    #     if (position[0]-self.hands_prev_position_right[0]) < 0.01:   
-    #         if self.move_right_time > 15 and (position[0] - self.hands_begin_position_right[0])> 80 and not (position[1] - self.action1_begin_position[1]) < -80:
-    #             self.move_right_time = -1
-    #             print("detect action2")
-    #             print(position[0] - self.hands_begin_position_right[0])
-    #             self.length = position[0] - self.hands_begin_position_right[0]
-    #             self.s = 2
-    #             self.time = 100
+    def detect_onehand(self,position,hand_available):
+        if hand_available:
+            if len(self.hand_position) > 15:
+                self.hand_position.append(position)
+                self.start_position = self.hand_position.pop(0)
+                # right
+                if self.state == 2 or self.state == 3:
+                    self.action_length = position[0] - self.action_begin_position
+                elif position[0] - self.start_position[0] > 80: 
+                    # print(self.hand_position)
+                    self.state = 2
+                    self.hand_position.clear()
+                    self.action_begin_position = self.start_position[0]
+                    print('2')
 
-    #     self.hands_prev_position_right = position
+                # left
+                elif position[0] - self.start_position[0] < -80:
+                    # print(self.hand_position)
+                    self.state = 3
+                    self.hand_position.clear()
+                    self.action_begin_position = self.start_position[0]
+                    print('3')
 
-    def detect_action2(self,position,available):
-        if available:
-            if self.s == 0:
-                if self.move_right_time == -1:
-                    self.move_right_time = self.move_right_time+1
-                    self.hands_prev_position_right = position
-                    return False
-            
-                # 判断是否往右边运动
-                if (position[0]-self.hands_prev_position_right[0]) > 0.01:
-                    if self.move_right_time == 0:
-                        #print('begin')
-                        self.hands_begin_position_right = self.hands_prev_position_right
-                    self.move_right_time = self.move_right_time + 1
-                    
-
-                if self.move_right_time > 15 and (position[0] - self.hands_begin_position_right[0])> 100 and not (position[1] - self.hands_begin_position_right[1]) < -80:
-                    self.move_right_time = -1
-                    print("detect action2")
-                    # print(position[0] - self.hands_begin_position_right[0])
-                    self.length = position[0] - self.hands_begin_position_right[0]
-                    self.s = 5
-                    # self.time = 100
-
-            if self.s == 5:
-                # print("state 5")
-                self.length = position[0] - self.hands_begin_position_right[0]
-                # print(self.length)
-
-            self.hands_prev_position_right = position
-            
-        if not available and self.s ==5:
-            self.s = 2
-            print('2')
-            print(self.length)
-            # self.clear_state()
-      
-
-        # 检测往左运动
-    # def detect_action3(self,position):
-    #     if self.move_left_time == -1:
-    #         self.move_left_time = self.move_left_time+1
-    #         self.hands_prev_position_left = position
-    #         return False
-            
-    #     # 判断是否往右边运动
-    #     if (position[0]-self.hands_prev_position_left[0]) < -0.01:
-    #         if self.move_left_time == 0:
-    #             # print('begin')
-    #             self.hands_begin_position_left = self.hands_prev_position_left
-    #         self.move_left_time = self.move_left_time + 1
-            
-    #     if (position[0]-self.hands_prev_position_left[0]) > -0.01:   
-    #         if self.move_left_time > 15 and (position[0] - self.hands_begin_position_left[0])< -80 and not (position[1] - self.action1_begin_position[1]) < -80:
-    #             self.move_left_time = -1
-    #             print("detect action3")
-    #             print(position[0] - self.hands_begin_position_left[0])
-    #             self.length = position[0] - self.hands_begin_position_left[0]
-    #             self.s = 3
-    #             self.time = 100
-
-    #     self.hands_prev_position_left = position
-
-    def detect_action3(self,position,available):
-        if available:
-            if self.s == 0:
-                if self.move_left_time == -1:
-                    self.move_left_time = self.move_left_time+1
-                    self.hands_prev_position_left = position
-                    return False
-            
-                # 判断是否往右边运动
-                if (position[0]-self.hands_prev_position_left[0]) < -0.01:
-                    if self.move_left_time == 0:
-                        # print('begin')
-                        self.hands_begin_position_left = self.hands_prev_position_left
-                    self.move_left_time = self.move_left_time + 1
-                    
-
-                if self.move_left_time > 15 and (position[0] - self.hands_begin_position_left[0])< -100 and not (position[1] - self.hands_begin_position_left[1]) < -80:
-                    self.move_left_time = -1
-                    print("detect action3")
-                    # print(position[0] - self.hands_begin_position_left[0])
-                    self.length = position[0] - self.hands_begin_position_left[0]
-                    self.s = 6
-                    # self.time = 100
-
-            if self.s == 6:
-                # print("state 6")
-                self.length = position[0] - self.hands_begin_position_left[0]
-                # print(self.length)
-
-
-            self.hands_prev_position_right = position
-
-            
-        if not available and self.s ==6:
-            self.s = 3
-            print('3')
-            print(self.length)
-            # self.clear_state()
-
+                # forward
+                elif position[1] - self.start_position[1] < -80:
+                    self.state = 1
+                    self.hand_position.clear()
+                    print('acti1 ')
+            else:
+                self.hand_position.append(position)
+        else:
+            if self.state == 2:
+                self.state = 4
+                print('s4')
+                print(self.action_length)
+               # print(self.hand_position)
+            elif self.state == 3:
+                self.state = 5
+                print('s5')
+                print(self.action_length)
+                # print(self.hand_position)
 
             
     def calculate_distance(self,left,right):
         dis = math.sqrt((left[0]-right[0])**2+(left[1]-right[1])**2+(left[2]-right[2])**2)
         return dis
 
-    def detect_action4(self,left_position,right_position):
-        if self.move_time == -1:
-            self.move_time = self.move_time+1
-            self.prev_distance = self.calculate_distance(right_position,left_position)
-            return False
+    def detect_twohand(self,left_position,right_position):
+        if len(self.hand_distance) > 10:
+            distance = self.calculate_distance(left_position,right_position)
+            self.hand_distance.append(distance)
+            self.start_distance = self.hand_distance.pop(0)
+            if distance - self.start_distance >80:
+                self.state = 6
+                print('s6')
+            elif distance - self.start_distance <- 80:
+                self.state = 7
+                print('s7')
 
-        self.distance = self.calculate_distance(right_position,left_position)
-        if self.distance > self.prev_distance:
-            if self.move_time == 0:
-                # print('begin Two')
-                self.action4_begin_distance = self.prev_distance
-            self.move_time = self.move_time +1
-            if self.move_time > 10 and (self.distance-self.action4_begin_distance)>80:
-                self.move_time = -1
-                print("detect action4")
-                print(self.distance-self.action4_begin_distance)
-                self.s = 4
-                # self.time = 100
-
-        if self.distance < self.prev_distance:
-            # print(self.move_time)
-            self.move_time = -1
-        
-        self.prev_distance = self.distance
-
-    def detect_action5(self,left_position,right_position):
-        if self.move_time_action5 == -1:
-            self.move_time_action5 = self.move_time_action5+1
-            self.prev_distance_action5 = self.calculate_distance(right_position,left_position)
-            return False
-
-        self.distance_action5 = self.calculate_distance(right_position,left_position)
-        if self.distance_action5 < self.prev_distance_action5:
-            if self.move_time_action5 == 0:
-                print('begin action5')
-                self.action5_begin_distance = self.prev_distance_action5
-            self.move_time_action5 = self.move_time_action5 +1
-            print(self.distance_action5)
-            if self.move_time_action5 > 10 and (self.distance_action5-self.action5_begin_distance)<150:
-                self.move_time_action5 = -1
-                print("detect action5")
-                print(self.distance_action5-self.action5_begin_distance)
-                self.s = 7
-                # self.time = 100
-
-        if self.distance_action5 < self.prev_distance_action5:
-            # print(self.move_time)
-            self.move_time_action5 = -1
-        
-        self.prev_distance_action5 = self.distance_action5
+        else:
+            self.hand_distance.append(self.calculate_distance(left_position,right_position))
 
     def clear_state(self):
-        self.s = 0
-        # self.time = 0
-        self.length = 0
-        self.action1_time = -1
-        self.move_left_time = -1
-        self.move_right_time = -1
-        self.move_time = -1
-        self.move_time_action5 = -1
+        self.state = 0
+        self.hand_position.clear()
+        self.start_position = None
+        self.action_begin_position = None #记录动作2(快进)和3（倒退）的起始位置
+        self.action_length = 0 #记录动作2和3的长度
+
+        self.hand_distance.clear()
+        self.start_distance = None
+
+    def clear_onehand_state(self):
+        if not self.state ==6 or not self.state == 7:
+            self.state = 0
+
+    
+        self.hand_position.clear()
+        self.start_position = None
+        self.action_begin_position = None #记录动作2(快进)和3（倒退）的起始位置
+        self.action_length = 0 #记录动作2和3的长度
 
 
 state = State()
@@ -298,23 +115,18 @@ class SampleListener(Leap.Listener):
         threadLock.acquire()
         # print(hand.direction[2])
 
-
-        state.detect_action2(hand.palm_position,hand.is_valid)
-        state.detect_action3(hand.palm_position,hand.is_valid)
-
-        if hand.is_valid and not hand1.is_valid:
-            state.detect_action1(hand.palm_position)
-            # state.detect_action2(hand.palm_position)
-            # state.detect_action3(hand.palm_position)
-
+        
         if hand.is_valid and hand1.is_valid:
-            # print("Two")
+            state.clear_onehand_state()
             left_hand = frame.hands.leftmost
             right_hand = frame.hands.rightmost
-            state.detect_action4(left_hand.palm_position, right_hand.palm_position)
-
+            state.detect_twohand(left_hand.palm_position, right_hand.palm_position)
+        else:
+            state.detect_onehand(hand.palm_position,hand.is_valid)
+            
         if not hand.is_valid:
-            state.clear_state()
+            if not state.state == 2 and not state.state == 3:
+                state.clear_state()
         # 释放锁
         threadLock.release()
 
@@ -343,10 +155,6 @@ def main():
     controller = Leap.Controller()
     controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
     controller.add_listener(listener)
-
-    # thread1 = PlayThread(1, "Thread-1")
-    # thread1.start()
-    # thread1.join()
 
     # Keep this process running until Enter is pressed
     print ("Press Enter to quit...")

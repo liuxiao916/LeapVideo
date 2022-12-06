@@ -12,6 +12,8 @@ class Player:
         else:
             self.media = vlc.MediaPlayer()
 
+            
+
     # 设置待播放的url地址或本地文件路径，每次调用都会重新加载资源
     def set_uri(self, uri):
         self.media.set_mrl(uri)
@@ -109,6 +111,31 @@ class Player:
     def is_fullscreen(self):
         return self.media.get_fullscreen()
 
+    def init_logo(self):
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_enable, 1)
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_x, 10)
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_y, 10)
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_opacity, 50)
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_position, 0)
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_repeat, 1000)
+
+    def set_logo(self, logo):
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_enable, 1)
+        self.media.video_set_logo_string(vlc.VideoLogoOption.logo_file, logo)
+    
+    def close_logo(self):
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_enable, 0)
+
+    def set_marquee(self):
+        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Enable, 1)
+        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Size, 50)
+        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Color, 0xff0000)
+        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Position, 0)
+        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Timeout, 0)
+        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Refresh, 10000)
+
+    def update_text(self, content):
+        self.media.video_set_marquee_string(vlc.VideoMarqueeOption.Text, content)
 
 
 
