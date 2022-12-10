@@ -113,9 +113,9 @@ class Player:
 
     def init_logo(self):
         self.media.video_set_logo_int(vlc.VideoLogoOption.logo_enable, 1)
-        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_x, 10)
-        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_y, 10)
-        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_opacity, 50)
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_x, 1000)
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_y, 1000)
+        self.media.video_set_logo_int(vlc.VideoLogoOption.logo_opacity, 1000)
         self.media.video_set_logo_int(vlc.VideoLogoOption.logo_position, 0)
         self.media.video_set_logo_int(vlc.VideoLogoOption.logo_repeat, 1000)
 
