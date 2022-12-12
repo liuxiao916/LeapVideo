@@ -20,7 +20,7 @@ class State():
     def detect_onehand(self,position,direction,hand_available):
         
         if hand_available:
-            if len(self.hand_position) > 15:
+            if len(self.hand_position) > 12:
                 self.hand_position.append(position)
                 self.start_position = self.hand_position.pop(0)
                 # right
@@ -42,7 +42,7 @@ class State():
                     print('3')
                         
                 # forward
-                elif position[1] - self.start_position[1] < -60:
+                elif position[1] - self.start_position[1] < -80:
                     self.state = 1
                     self.hand_position.clear()
                     print('acti1 ')
