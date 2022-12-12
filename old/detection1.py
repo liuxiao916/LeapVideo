@@ -23,43 +23,45 @@ class State():
             if len(self.hand_position) > 15:
                 self.hand_position.append(position)
                 self.start_position = self.hand_position.pop(0)
-                # right
-                if self.state == 2 or self.state == 3:
-                    self.action_length = position[0] - self.action_begin_position
-                elif position[0] - self.start_position[0] > 80: 
-                    # print(self.hand_position)
-                    self.state = 2
-                    self.hand_position.clear()
-                    self.action_begin_position = self.start_position[0]
-                    print('2')
+                if abs(direction[2]) < 0.75:
+                    # right
+                    if self.state == 2 or self.state == 3:
+                        self.action_length = position[0] - self.action_begin_position
+                    elif position[0] - self.start_position[0] > 80: 
+                        # print(self.hand_position)
+                        self.state = 2
+                        self.hand_position.clear()
+                        self.action_begin_position = self.start_position[0]
+                        print('2')
 
-                # left
-                elif position[0] - self.start_position[0] < -80:
-                    # print(self.hand_position)
-                    self.state = 3
-                    self.hand_position.clear()
-                    self.action_begin_position = self.start_position[0]
-                    print('3')
-                        
-                # forward
-                elif position[1] - self.start_position[1] < -60:
-                    self.state = 1
-                    self.hand_position.clear()
-                    print('acti1 ')
+                    # left
+                    elif position[0] - self.start_position[0] < -80:
+                        # print(self.hand_position)
+                        self.state = 3
+                        self.hand_position.clear()
+                        self.action_begin_position = self.start_position[0]
+                        print('3')
+                         
+                    # forward
+                    elif position[1] - self.start_position[1] < -80:
+                        self.state = 1
+                        self.hand_position.clear()
+                        print('acti1 ')
 
-                # up 
-                elif (position[2] - self.start_position[2] < -80) :
-                    # print(self.hand_position)
-                    self.state = 8
-                    self.hand_position.clear()
-                    print('8')
+                else: 
+                    # up 
+                    if (position[2] - self.start_position[2] < -20) :
+                        # print(self.hand_position)
+                        self.state = 8
+                        self.hand_position.clear()
+                        print('8')
 
-                # down
-                elif position[2] - self.start_position[2] > 80:
-                    # print(self.hand_position)
-                    self.state = 9
-                    self.hand_position.clear()
-                    print('9')
+                    # down
+                    elif position[2] - self.start_position[2] > 20:
+                        # print(self.hand_position)
+                        self.state = 9
+                        self.hand_position.clear()
+                        print('9')
 
             else:
                 self.hand_position.append(position)

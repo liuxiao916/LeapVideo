@@ -128,9 +128,10 @@ class Player:
 
     def set_marquee(self):
         self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Enable, 1)
-        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Size, 50)
-        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Color, 0xff0000)
-        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Position, 0)
+        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Size, 32)
+        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Color, 0xffffff)
+        self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Position, 8)       
+        # self.media.video_set_marquee_string(vlc.VideoMarqueeOption.Position, 'right')
         self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Timeout, 0)
         self.media.video_set_marquee_int(vlc.VideoMarqueeOption.Refresh, 10000)
 

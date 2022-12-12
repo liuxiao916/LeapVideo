@@ -54,7 +54,7 @@ def main():
     down = 'pic/down.png'
     videoplayer.init_logo()
     videoplayer.set_marquee()
-
+    # videoplayer.update_text("%Y-%m-%d %H:%M:%S")
 
     while True:
         if state.state == 1:
@@ -71,6 +71,7 @@ def main():
                 videoplayer.set_logo(play)
                 time.sleep(2)
                 videoplayer.close_logo()
+                videoplayer.update_text(' ')
     
 
         if state.state == 2:
@@ -95,10 +96,10 @@ def main():
             videoplayer.set_position(set_time/video_length)
             print("完成快进")
             videoplayer.resume()
-            videoplayer.update_text(' ')
             state.clear_state()
             time.sleep(2)
             videoplayer.close_logo()
+            videoplayer.update_text(' ')
 
         
         if state.state == 3:
@@ -123,10 +124,10 @@ def main():
             videoplayer.set_position(set_time/video_length)
             print("完成退")
             videoplayer.resume()
-            videoplayer.update_text(' ')
             state.clear_state()
             time.sleep(2)
             videoplayer.close_logo()
+            videoplayer.update_text(' ')
 
         if state.state == 6 :
             #print("action 4")
@@ -161,6 +162,7 @@ def main():
             state.clear_state()
             time.sleep(2)   
             videoplayer.close_logo() 
+            videoplayer.update_text(' ')
             
 
         if state.state == 9:
@@ -175,6 +177,7 @@ def main():
             state.clear_state()
             time.sleep(2)
             videoplayer.close_logo() 
+            videoplayer.update_text(' ')
             
 
         pass
