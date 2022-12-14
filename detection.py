@@ -1,4 +1,4 @@
-import Leap
+from resources.Windows import Leap
 import sys
 import threading
 import numpy as np
@@ -18,13 +18,14 @@ class State():
         self.start_distance = None
         
     def detect_onehand(self,position,direction,hand_available):
-        
+        # print(position)
         if hand_available:
             if len(self.hand_position) > 12:
                 self.hand_position.append(position)
                 self.start_position = self.hand_position.pop(0)
                 # right
                 if self.state == 2 or self.state == 3:
+                    print(self.state)
                     self.action_length = position[0] - self.action_begin_position
                 elif position[0] - self.start_position[0] > 80: 
                     # print(self.hand_position)
@@ -169,7 +170,7 @@ class PlayThread (threading.Thread):
 def main():
     listener = SampleListener()
     controller = Leap.Controller()
-    controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
+    # controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
     controller.add_listener(listener)
 
     # Keep this process running until Enter is pressed

@@ -1,6 +1,6 @@
 import detection
 import player
-import Leap
+from resources.Windows import Leap
 import sys
 import vlc
 import threading
@@ -39,7 +39,7 @@ class SampleListener(Leap.Listener):
 def main():
     listener = SampleListener()
     controller = Leap.Controller()
-    controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
+    # controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
     controller.add_listener(listener)
 
     videoplayer = player.Player()
@@ -80,7 +80,10 @@ def main():
             video_length = videoplayer.get_length()     #  总时间
             time_current = videoplayer.get_time() # 当前时间
             set_time  = int((state.action_length/500)*(video_length-time_current)) + time_current
-             
+            print('test2')
+            print(time_current) 
+            print('test1')
+            print(video_length)
             print("准备快进到")
             print("video time" + str(set_time/video_length))
             videoplayer.set_logo(right)
@@ -89,45 +92,45 @@ def main():
             time.sleep(0.5)
             
 
-        if state.state == 4:
-            video_length = videoplayer.get_length()     #  总时间
-            time_current = videoplayer.get_time() # 当前时间
-            set_time  = int((state.action_length/500)*(video_length-time_current)) + time_current
-            videoplayer.set_position(set_time/video_length)
-            print("完成快进")
-            videoplayer.resume()
-            state.clear_state()
-            time.sleep(2)
-            videoplayer.close_logo()
-            videoplayer.update_text(' ')
+        # if state.state == 4:
+        #     video_length = videoplayer.get_length()     #  总时间
+        #     time_current = videoplayer.get_time() # 当前时间
+        #     set_time  = int((state.action_length/500)*(video_length-time_current)) + time_current
+        #     videoplayer.set_position(set_time/video_length)
+        #     print("完成快进")
+        #     videoplayer.resume()
+        #     state.clear_state()
+        #     time.sleep(2)
+        #     videoplayer.close_logo()
+        #     videoplayer.update_text(' ')
 
         
-        if state.state == 3:
-            if videoplayer.is_playing():
-                videoplayer.pause()
-            video_length = videoplayer.get_length()     #  总时间
-            time_current = videoplayer.get_time() # 当前时间
-            set_time  = time_current + int((state.action_length/500)*(time_current))
+        # if state.state == 3:
+        #     if videoplayer.is_playing():
+        #         videoplayer.pause()
+        #     video_length = videoplayer.get_length()     #  总时间
+        #     time_current = videoplayer.get_time() # 当前时间
+        #     set_time  = time_current + int((state.action_length/500)*(time_current))
              
-            print("准备退到")
-            print("video time" + str(set_time/video_length))
-            videoplayer.set_logo(left)
-            sting = "准备快退到 {} %".format('%.4f'%(set_time/video_length*100))
-            videoplayer.update_text(sting)
-            time.sleep(0.5)
+        #     print("准备退到")
+        #     print("video time" + str(set_time/video_length))
+        #     videoplayer.set_logo(left)
+        #     sting = "准备快退到 {} %".format('%.4f'%(set_time/video_length*100))
+        #     videoplayer.update_text(sting)
+        #     time.sleep(0.5)
             
 
-        if state.state == 5:
-            video_length = videoplayer.get_length()     #  总时间
-            time_current = videoplayer.get_time() # 当前时间
-            set_time  = int((state.action_length/500)*(video_length-time_current)) + time_current
-            videoplayer.set_position(set_time/video_length)
-            print("完成退")
-            videoplayer.resume()
-            state.clear_state()
-            time.sleep(2)
-            videoplayer.close_logo()
-            videoplayer.update_text(' ')
+        # if state.state == 5:
+        #     video_length = videoplayer.get_length()     #  总时间
+        #     time_current = videoplayer.get_time() # 当前时间
+        #     set_time  = int((state.action_length/500)*(video_length-time_current)) + time_current
+        #     videoplayer.set_position(set_time/video_length)
+        #     print("完成退")
+        #     videoplayer.resume()
+        #     state.clear_state()
+        #     time.sleep(2)
+        #     videoplayer.close_logo()
+        #     videoplayer.update_text(' ')
 
         if state.state == 6 :
             #print("action 4")
