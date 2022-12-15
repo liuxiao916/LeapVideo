@@ -18,63 +18,50 @@ class State():
         self.start_distance = None
         
     def detect_onehand(self,position,direction,hand_available):
-        # print(position)
-        if hand_available:
-            if len(self.hand_position) > 12:
-                self.hand_position.append(position)
-                self.start_position = self.hand_position.pop(0)
-                # right
-                if self.state == 2 or self.state == 3:
-                    print(self.state)
-                    self.action_length = position[0] - self.action_begin_position
-                elif position[0] - self.start_position[0] > 80: 
-                    # print(self.hand_position)
-                    self.state = 2
-                    self.hand_position.clear()
-                    self.action_begin_position = self.start_position[0]
-                    print('2')
-
-                # left
-                elif position[0] - self.start_position[0] < -80:
-                    # print(self.hand_position)
-                    self.state = 3
-                    self.hand_position.clear()
-                    self.action_begin_position = self.start_position[0]
-                    print('3')
-                        
-                # forward
-                elif position[1] - self.start_position[1] < -80:
-                    self.state = 1
-                    self.hand_position.clear()
-                    print('acti1 ')
-
-                # up 
-                elif (position[2] - self.start_position[2] < -80) :
-                    # print(self.hand_position)
-                    self.state = 8
-                    self.hand_position.clear()
-                    print('8')
-
-                # down
-                elif position[2] - self.start_position[2] > 80:
-                    # print(self.hand_position)
-                    self.state = 9
-                    self.hand_position.clear()
-                    print('9')
-
-            else:
-                self.hand_position.append(position)
-        else:
-            if self.state == 2:
-                self.state = 4
-                print('s4')
-                print(self.action_length)
-               # print(self.hand_position)
-            elif self.state == 3:
-                self.state = 5
-                print('s5')
-                print(self.action_length)
+        if len(self.hand_position) > 12:
+            self.hand_position.append(position)
+            self.start_position = self.hand_position.pop(0)
+            # right
+            # if self.state == 2 or self.state == 3:
+            #     print(self.state)
+            #     self.action_length = position[0] - self.action_begin_position
+            if position[0] - self.start_position[0] > 120: 
                 # print(self.hand_position)
+                self.state = 2
+                self.hand_position.clear()
+                self.action_begin_position = self.start_position[0]
+                print('2')
+
+            # left
+            elif position[0] - self.start_position[0] < -120:
+                # print(self.hand_position)
+                self.state = 3
+                self.hand_position.clear()
+                self.action_begin_position = self.start_position[0]
+                print('3')
+                    
+            # forward
+            elif position[1] - self.start_position[1] < -100:
+                self.state = 1
+                self.hand_position.clear()
+                print('acti1 ')
+
+            # up 
+            elif (position[2] - self.start_position[2] < -100) :
+                # print(self.hand_position)
+                self.state = 8
+                self.hand_position.clear()
+                print('8')
+
+            # down
+            elif position[2] - self.start_position[2] > 100:
+                # print(self.hand_position)
+                self.state = 9
+                self.hand_position.clear()
+                print('9')
+
+        else:
+            self.hand_position.append(position)
 
             
     def calculate_distance(self,left,right):
@@ -88,10 +75,10 @@ class State():
             self.start_distance = self.hand_distance.pop(0)
             if distance - self.start_distance >80:
                 self.state = 6
-                print('s6')
+                # print('s6')
             elif distance - self.start_distance <- 80:
                 self.state = 7
-                print('s7')
+                # print('s7')
 
         else:
             self.hand_distance.append(self.calculate_distance(left_position,right_position))

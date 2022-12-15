@@ -28,8 +28,7 @@ class SampleListener(Leap.Listener):
             state.detect_onehand(hand.palm_position,hand.palm_normal,hand.is_valid)
             
         if not hand.is_valid:
-            if not state.state == 2 and not state.state == 3 and not state.state == 4 and not state.state == 5:
-                state.clear_state()
+            state.clear_state()
         # 释放锁
         threadLock.release()
 
@@ -75,21 +74,22 @@ def main():
     
 
         if state.state == 2:
-            if videoplayer.is_playing():
-                videoplayer.pause()
+            # videoplayer.pause()
             video_length = videoplayer.get_length()     #  总时间
             time_current = videoplayer.get_time() # 当前时间
-            set_time  = int((state.action_length/500)*(video_length-time_current)) + time_current
-            print('test2')
-            print(time_current) 
-            print('test1')
-            print(video_length)
-            print("准备快进到")
-            print("video time" + str(set_time/video_length))
+            set_time = time_current + 15000
+            if set_time > video_length:
+                set_time = video_length - 1
+            
+            # set_time  = int((state.action_length/500)*(video_length-time_current)) + time_current
             videoplayer.set_logo(right)
-            sting = "准备快进到 {} %".format('%.4f'%(set_time/video_length*100))
-            videoplayer.update_text(sting)
-            time.sleep(0.5)
+            #sting = "准备快进到 {} %".format('%.4f'%(set_time/video_length*100))
+            videoplayer.set_position(set_time/video_length)
+            videoplayer.update_text("快进15秒")
+            # videoplayer.resume()
+            time.sleep(2)
+            videoplayer.close_logo()
+            videoplayer.update_text(' ')
             
 
         # if state.state == 4:
@@ -105,19 +105,23 @@ def main():
         #     videoplayer.update_text(' ')
 
         
-        # if state.state == 3:
-        #     if videoplayer.is_playing():
-        #         videoplayer.pause()
-        #     video_length = videoplayer.get_length()     #  总时间
-        #     time_current = videoplayer.get_time() # 当前时间
-        #     set_time  = time_current + int((state.action_length/500)*(time_current))
-             
-        #     print("准备退到")
-        #     print("video time" + str(set_time/video_length))
-        #     videoplayer.set_logo(left)
-        #     sting = "准备快退到 {} %".format('%.4f'%(set_time/video_length*100))
-        #     videoplayer.update_text(sting)
-        #     time.sleep(0.5)
+        if state.state == 3:
+            # videoplayer.pause()
+            video_length = videoplayer.get_length()     #  总时间
+            time_current = videoplayer.get_time() # 当前时间
+            set_time = time_current - 15000
+            if set_time < 0:
+                set_time = 1
+            
+            # set_time  = int((state.action_length/500)*(video_length-time_current)) + time_current
+            videoplayer.set_logo(left)
+            #sting = "准备快进到 {} %".format('%.4f'%(set_time/video_length*100))
+            videoplayer.set_position(set_time/video_length)
+            videoplayer.update_text("快退15秒")
+            # videoplayer.resume()
+            time.sleep(2)
+            videoplayer.close_logo()
+            videoplayer.update_text(' ')
             
 
         # if state.state == 5:
