@@ -42,7 +42,7 @@ class State():
                     print('3')
                         
                 # forward
-                elif position[1] - self.start_position[1] < -80:
+                elif position[1] - self.start_position[1] < -70:
                     self.state = 1
                     self.hand_position.clear()
                     print('acti1 ')
